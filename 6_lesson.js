@@ -59,19 +59,28 @@ const catalog = {
         {
             name: 'product1',
             price: '100',
-            quantity: 1
+            quantity: 1,
+            index: 0,
+            src: 'img/1.png',
+            full_image_src: 'img/1_full.jpg'
         },
 
         {
             name: 'product2',
             price: '200',
-            quantity: 1
+            quantity: 1,
+            index: 1,
+            src: 'img/2.png',
+            full_image_src: 'img/2_full.jpg'
         },
 
         {
             name: 'product3',
             price: '300',
-            quantity: 1
+            quantity: 1,
+            index: 2,
+            src: 'img/3.png',
+            full_image_src: 'img/3_full.jpg'
         }
     ],
     catalogGenerate() {
@@ -100,8 +109,9 @@ const catalog = {
         catalogGoodDiv.appendChild(catalogImg);
         catalogGoodDiv.appendChild(catalogClearDiv);
         catalogGoodDiv.appendChild(catalogButton);
-        catalogImg.src = `img/${i + 1}.png`;
-        catalogImg.dataset.full_image_url = `img/${i + 1}_full.jpg`;
+        catalogImg.src = this.goods[i].src;
+        catalogImg.dataset.full_image_url = this.goods[i].full_image_src;
+        catalogImg.dataset.list = `${Number(i)}`;
         catalogButton.innerHTML = 'Добавить в корзину'
         catalogGoodDiv.innerHTML += `Товар: ${this.goods[i].name} <br>Цена: ${this.goods[i].price}`;
         document.querySelector('.catalog').appendChild(catalogGoodDiv);
@@ -125,17 +135,23 @@ const catalog = {
         document.querySelector('body').appendChild(fullImageDiv);
         document.querySelector('.closed').addEventListener('click', event => this.closeFullImage(event));
         document.querySelector('.arrowLeft').addEventListener('click', event => this.previousGood(event));
+        document.querySelector('.arrowRight').addEventListener('click', event => this.previousGood(event));
     },
     previousGood(event) {
         document.querySelector('.fullImageDiv').remove();
-
+        document.querySelector('body').appendChild(this.getFullImageDiv(event));
+        this.eventClick();
     },
     getFullImageDiv(event) {
         const fullImageDiv = document.createElement('div');
         fullImageDiv.classList.add('fullImageDiv');
         const fullImage = document.createElement('img');
         fullImage.classList.add('fullImage');
-        fullImage.src = `${event.target.dataset.full_image_url}`;
+            if (event.target.className === 'smallImg') fullImage.src = `${event.target.dataset.full_image_url}`;
+            if (event.target.dataset.list  === '1' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[1].full_image_src}`;
+            if (event.target.dataset.list  === '0' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[0].full_image_src}`;
+            if (event.target.dataset.list  === '1' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[1].full_image_src}`;
+            if (event.target.dataset.list  === '2' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[2].full_image_src}`;
         const close = document.createElement('img');
         close.classList.add('closed');
         close.src = 'img/cross.png'
@@ -144,10 +160,12 @@ const catalog = {
         const arrowLeft = document.createElement('img');
         arrowLeft.classList.add('arrowLeft');
         arrowLeft.src = 'img/left.png';
+        arrowLeft.dataset.list = `${Number(event.target.dataset.list) - 1}`;
         fullImageDiv.appendChild(arrowLeft);
         const arrowRight = document.createElement('img');
         arrowRight.classList.add('arrowRight');
         arrowRight.src = 'img/right.png';
+        arrowRight.dataset.list = `${Number(event.target.dataset.list) + 1}`;
         fullImageDiv.appendChild(arrowRight);
         return fullImageDiv;
     },
