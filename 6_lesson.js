@@ -106,12 +106,13 @@ const catalog = {
         catalogClearDiv.classList.add('clear');
         const catalogButton = document.createElement('button');
         catalogButton.dataset.index = `${i}`;
+        catalogGoodDiv.dataset.index = `${i}`;
+        catalogImg.dataset.index = `${i}`;
         catalogGoodDiv.appendChild(catalogImg);
         catalogGoodDiv.appendChild(catalogClearDiv);
         catalogGoodDiv.appendChild(catalogButton);
         catalogImg.src = this.goods[i].src;
         catalogImg.dataset.full_image_url = this.goods[i].full_image_src;
-        catalogImg.dataset.list = `${Number(i)}`;
         catalogButton.innerHTML = 'Добавить в корзину'
         catalogGoodDiv.innerHTML += `Товар: ${this.goods[i].name} <br>Цена: ${this.goods[i].price}`;
         document.querySelector('.catalog').appendChild(catalogGoodDiv);
@@ -139,8 +140,7 @@ const catalog = {
     },
     previousGood(event) {
         document.querySelector('.fullImageDiv').remove();
-        document.querySelector('body').appendChild(this.getFullImageDiv(event));
-        this.eventClick();
+        this.isImageClick(event);
     },
     getFullImageDiv(event) {
         const fullImageDiv = document.createElement('div');
@@ -148,10 +148,18 @@ const catalog = {
         const fullImage = document.createElement('img');
         fullImage.classList.add('fullImage');
             if (event.target.className === 'smallImg') fullImage.src = `${event.target.dataset.full_image_url}`;
-            if (event.target.dataset.list  === '1' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[1].full_image_src}`;
-            if (event.target.dataset.list  === '0' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[0].full_image_src}`;
-            if (event.target.dataset.list  === '1' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[1].full_image_src}`;
-            if (event.target.dataset.list  === '2' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[2].full_image_src}`;
+            if (event.target.dataset.index  === '1' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[1].full_image_src}`;
+            if (event.target.dataset.index  === '0' && event.target.className === 'arrowLeft') fullImage.src = `${this.goods[0].full_image_src}`;
+            if (event.target.dataset.index  === '1' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[1].full_image_src}`;
+            if (event.target.dataset.index  === '2' && event.target.className === 'arrowRight') fullImage.src = `${this.goods[2].full_image_src}`;
+            if (Number(event.target.dataset.index) > (this.goods.length - 1) && event.target.className === 'arrowRight') {
+                fullImage.src = `${this.goods[0].full_image_src}`;
+                event.target.dataset.index = `0`;
+            }
+            if (Number(event.target.dataset.index) < 0 && event.target.className === 'arrowLeft') {
+                fullImage.src = `${this.goods[2].full_image_src}`;
+                event.target.dataset.index = `2`;
+            }
         const close = document.createElement('img');
         close.classList.add('closed');
         close.src = 'img/cross.png'
@@ -160,12 +168,12 @@ const catalog = {
         const arrowLeft = document.createElement('img');
         arrowLeft.classList.add('arrowLeft');
         arrowLeft.src = 'img/left.png';
-        arrowLeft.dataset.list = `${Number(event.target.dataset.list) - 1}`;
+        arrowLeft.dataset.index = `${Number(event.target.dataset.index) - 1}`;
         fullImageDiv.appendChild(arrowLeft);
         const arrowRight = document.createElement('img');
         arrowRight.classList.add('arrowRight');
         arrowRight.src = 'img/right.png';
-        arrowRight.dataset.list = `${Number(event.target.dataset.list) + 1}`;
+        arrowRight.dataset.index = `${Number(event.target.dataset.index) + 1}`;
         fullImageDiv.appendChild(arrowRight);
         return fullImageDiv;
     },
