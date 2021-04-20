@@ -6,8 +6,8 @@ const basket = {
     ],
 
     totalPrice() {
-        return this.goods.reduce((sum, good) => {
-            return sum + this.goods.price * this.goods.quantity;
+        return catalog.unique(this.goods).reduce((sum, goods) => {
+            return sum + goods.price * goods.quantity;
         }, 0);
     },
 
@@ -25,32 +25,8 @@ const basket = {
         basketList.classList.add('basketList');
         basket.appendChild(basketList);
         document.querySelector('body').appendChild(basket);
-
+        catalog.totality();
     },
-    generateBasketList() {
-        if (this.goods.length === 0) return null;
-        document.querySelector('.basketList').innerHTML = '';
-        for (let i = 0; i < this.goods.length; i++) {
-        }
-        // for (let i = 0; i < this.goods.length; i++) {
-        //     const basketGoodDiv = document.createElement('div');
-        //     basketGoodDiv.classList.add('good');
-        //     const basketImg = document.createElement('img');
-        //     basketImg.classList.add('smallImg');
-        //     const basketClearDiv = document.createElement('div');
-        //     basketClearDiv.classList.add('clear');
-        //     const basketButton = document.createElement('button');
-        //     basketButton.dataset.index = `${i}`;
-        //     basketGoodDiv.appendChild(basketImg);
-        //     basketGoodDiv.appendChild(basketClearDiv);
-        //     basketGoodDiv.appendChild(basketButton);
-        //     basketImg.src = `img/${i + 1}.png`;
-        //     basketImg.dataset.full_image_url = `img/${i + 1}_full.jpg`;
-        //     basketButton.innerHTML = 'Удалить'
-        //     basketGoodDiv.innerHTML += `Товар: ${this.goods[i].name} <br>Цена: ${this.goods[i].price} <br>Колличество: ${this.goods[i].quantity}`;
-        //     document.querySelector('.basket').appendChild(basketGoodDiv);
-        // }
-    }
 }
 
 const catalog = {
@@ -58,8 +34,8 @@ const catalog = {
     goods: [
         {
             name: 'product1',
-            price: '100',
-            quantity: 1,
+            price: 100,
+            quantity: 0,
             index: 0,
             src: 'img/1.png',
             full_image_src: 'img/1_full.jpg'
@@ -67,8 +43,8 @@ const catalog = {
 
         {
             name: 'product2',
-            price: '200',
-            quantity: 1,
+            price: 200,
+            quantity: 0,
             index: 1,
             src: 'img/2.png',
             full_image_src: 'img/2_full.jpg'
@@ -76,8 +52,8 @@ const catalog = {
 
         {
             name: 'product3',
-            price: '300',
-            quantity: 1,
+            price: 300,
+            quantity: 0,
             index: 2,
             src: 'img/3.png',
             full_image_src: 'img/3_full.jpg'
@@ -94,6 +70,7 @@ const catalog = {
         catalogDiv.classList.add('catalog');
         const catalogH3 = document.createElement('h3');
         catalogH3.innerHTML = 'CATALOG';
+        catalogDiv.appendChild(catalogH3);
         return catalogDiv;
     },
     getCatalogList() {
@@ -182,9 +159,44 @@ const catalog = {
     },
     isButtonClick(event) {
         if (event.target.tagName !== 'BUTTON') return;
-        let i = event.target.dataset.index;
-        basket.goods.push(this.goods[Number(i)]);
-        basket.generateBasketList();
+        document.querySelector('.total').remove();
+        this.goods[Number(event.target.dataset.index)].quantity++;
+        basket.goods.push(this.goods[Number(event.target.dataset.index)]);
+        document.querySelector('.basketList').innerHTML = ``;
+        this.unique(basket.goods).forEach((value, index) => {
+                const basketGoodDiv = document.createElement('div');
+                basketGoodDiv.classList.add('good');
+                const basketImg = document.createElement('img');
+                basketImg.classList.add('smallImg');
+                const basketClearDiv = document.createElement('div');
+                basketClearDiv.classList.add('clear');
+                basketGoodDiv.dataset.index = `${index}`;
+                basketImg.dataset.index = `${index}`;
+                basketGoodDiv.appendChild(basketImg);
+                basketGoodDiv.appendChild(basketClearDiv);
+                basketImg.src = value.src;
+                basketImg.dataset.full_image_url = value.full_image_src;
+                basketGoodDiv.innerHTML += `Товар: ${value.name} <br>Цена: ${value.price} <br>Колличество: ${value.quantity}`;
+                document.querySelector('.basketList').appendChild(basketGoodDiv);
+        })
+        this.totality();
+    },
+    unique(arr) {
+        let result = [];
+
+            for (let str of arr) {
+                if (!result.includes(str)) {
+                    result.push(str);
+                }
+            }
+
+        return result;
+    },
+    totality() {
+        const total = document.createElement('div');
+        total.classList.add('total');
+        total.innerHTML = `Всего товаров: ${basket.goodsCount()} <br>На сумму: ${basket.totalPrice()}`;
+        document.querySelector('.basket').appendChild(total);
     }
 }
 catalog.catalogGenerate();
